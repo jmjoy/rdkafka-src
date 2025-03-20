@@ -49,9 +49,10 @@ impl Build {
         self.clean_up()?;
 
         copy_all(&self.source_dir, &self.build_dir)?;
-        
+
         self.handle_dot_git()?;
-        self.checkout_version()?;
+        self.switch_to_version()?;
+
         self.configure()?;
         self.make()?;
         self.make_install()?;
@@ -79,7 +80,7 @@ impl Build {
         Ok(())
     }
 
-    fn handle_dot_git(&self) -> Result<(), Box<dyn Error>>  {
+    fn handle_dot_git(&self) -> Result<(), Box<dyn Error>> {
         let dot_git_path = self.build_dir.join(".git");
         if dot_git_path.is_dir() {
             return Ok(());
@@ -87,12 +88,13 @@ impl Build {
         if dot_git_path.exists() {
             fs::remove_file(&dot_git_path)?;
         }
-        let dot_git_src_path = execute_command(&["git", "rev-parse", "--git-dir"], &self.source_dir)?;
+        let dot_git_src_path =
+            execute_command(&["git", "rev-parse", "--git-dir"], &self.source_dir)?;
         copy_all(Path::new(dot_git_src_path.trim()), &dot_git_path)?;
         Ok(())
     }
 
-    fn checkout_version(&self) -> Result<(), Box<dyn Error>> {
+    fn switch_to_version(&self) -> Result<(), Box<dyn Error>> {
         let version = format!("v{}.*", self.version);
         let tags = execute_command(&["git", "tag", "-l", &version], &self.build_dir)?;
 
@@ -108,7 +110,7 @@ impl Build {
             return Err("version not found".into());
         };
 
-        execute_command(&["git", "checkout", &version], &self.build_dir)?;
+        execute_command(&["git", "reset", "--hard", &version], &self.build_dir)?;
         Ok(())
     }
 

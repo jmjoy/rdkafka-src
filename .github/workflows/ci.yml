@@ -25,11 +25,6 @@ jobs:
         with:
           submodules: 'recursive'
           fetch-depth: 0
-      
-      - run: |
-          ls -alh
-          ls -alh librdkafka
-          cd librdkafka && git status && git log -n 10
 
       - name: Setup rust
         run: |

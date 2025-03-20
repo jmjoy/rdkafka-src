@@ -7,4 +7,7 @@ description = "Simplifies integrating librdkafka into Rust."
 license = "MulanPSL-2.0"
 repository = "https://github.com/jmjoy/rdkafka-src"
 
+# By default, the submodule's .git folder is excluded, but it is required when managing librdkafka versions.
+include = ["/**", "!/.git/**"]
+
 [dependencies]

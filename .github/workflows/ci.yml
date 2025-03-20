@@ -22,28 +22,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Fetch submodules
         run: |
           git submodule update --init
+          git submodule foreach 'git fetch --tags'
       
       - run: |
           ls -alh
           ls -alh librdkafka
           cd librdkafka && git status && git log -n 10
-
-      - name: Setup cargo cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ci-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Setup rust
         run: |

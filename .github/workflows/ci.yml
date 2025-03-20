@@ -31,7 +31,7 @@ jobs:
       - run: |
           ls -alh
           ls -alh librdkafka
-          cd librdkafka && git status && git log -n 10
+          cd librdkafka && git status && git log -n 10 && ls -alh .git
 
       - name: Setup rust
         run: |

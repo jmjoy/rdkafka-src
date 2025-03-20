@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - dev
   pull_request:
     branches: [ "**" ]
 
@@ -27,6 +28,11 @@ jobs:
       - name: Fetch submodules
         run: |
           git submodule update --init
+      
+      - run: |
+          ls -alh
+          ls -alh librdkafka
+          cd librdkafka && git status && git log -n 10
 
       - name: Setup cargo cache
         uses: actions/cache@v3

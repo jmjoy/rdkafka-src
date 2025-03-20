@@ -88,7 +88,7 @@ impl Build {
             fs::remove_file(&dot_git_path)?;
         }
         let dot_git_src_path = execute_command(&["git", "rev-parse", "--git-dir"], &self.source_dir)?;
-        copy_all(Path::new(&dot_git_src_path), &dot_git_path)?;
+        copy_all(Path::new(dot_git_src_path.trim()), &dot_git_path)?;
         Ok(())
     }
 

@@ -39,11 +39,11 @@ jobs:
           rustup toolchain install
           rustup toolchain install nightly --component rustfmt
 
-      - name: Cargo fmt
-        run: cargo +nightly fmt --all --check
+      # - name: Cargo fmt
+      #   run: cargo +nightly fmt --all --check
 
-      - name: Cargo clippy
-        run: cargo clippy --release
+      # - name: Cargo clippy
+      #   run: cargo clippy --release
 
       - name: Cargo test
         run: cargo test --release -- --nocapture

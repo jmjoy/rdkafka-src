@@ -48,7 +48,13 @@ impl Build {
     pub fn build(self) -> Result<Artifacts, Box<dyn Error>> {
         self.clean_up()?;
 
+        dbg!(&self.source_dir, &self.build_dir);
+
         copy_all(&self.source_dir, &self.build_dir)?;
+
+        execute_command(&["ls", "-alh"], &self.build_dir)?;
+        execute_command(&["ls", "-alh", ".git"], &self.build_dir)?;
+        execute_command(&["git", "status"], &self.build_dir)?;
 
         self.checkout_version()?;
         self.configure()?;

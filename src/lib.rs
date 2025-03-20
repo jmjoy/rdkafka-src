@@ -48,14 +48,9 @@ impl Build {
     pub fn build(self) -> Result<Artifacts, Box<dyn Error>> {
         self.clean_up()?;
 
-        dbg!(&self.source_dir, &self.build_dir);
-
         copy_all(&self.source_dir, &self.build_dir)?;
-
-        execute_command(&["ls", "-alh"], &self.build_dir)?;
-        execute_command(&["ls", "-alh", ".git"], &self.build_dir)?;
-        execute_command(&["git", "status"], &self.build_dir)?;
-
+        
+        self.handle_dot_git()?;
         self.checkout_version()?;
         self.configure()?;
         self.make()?;
@@ -81,6 +76,19 @@ impl Build {
         }
         fs::create_dir_all(&self.build_dir)?;
 
+        Ok(())
+    }
+
+    fn handle_dot_git(&self) -> Result<(), Box<dyn Error>>  {
+        let dot_git_path = self.build_dir.join(".git");
+        if dot_git_path.is_dir() {
+            return Ok(());
+        }
+        if dot_git_path.exists() {
+            fs::remove_file(&dot_git_path)?;
+        }
+        let dot_git_src_path = execute_command(&["git", "rev-parse", "--git-dir"], &self.source_dir)?;
+        copy_all(Path::new(&dot_git_src_path), &dot_git_path)?;
         Ok(())
     }
 
@@ -162,6 +170,7 @@ fn copy_all(src: &Path, dst: &Path) -> Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
+
 fn execute_command(cmd: &[&str], current_dir: impl AsRef<Path>) -> Result<String, Box<dyn Error>> {
     let [program, args @ ..] = cmd else {
         return Err("cmd is empty".to_string().into());

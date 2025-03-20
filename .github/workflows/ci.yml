@@ -25,19 +25,11 @@ jobs:
         with:
           submodules: 'recursive'
           fetch-depth: 0
-
-      - name: Fetch submodules
-        run: |
-          git submodule update --init
-          git submodule foreach 'git fetch --tags'
       
       - run: |
           ls -alh
           ls -alh librdkafka
           cd librdkafka && git status && git log -n 10
-
-      - run: |
-          cd librdkafka/.git && pwd && ls -alh
 
       - name: Setup rust
         run: |

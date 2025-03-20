@@ -50,7 +50,9 @@ impl Build {
 
         copy_all(&self.source_dir, &self.build_dir)?;
 
-        self.checkout_version()?;
+        self.handle_dot_git()?;
+        self.switch_to_version()?;
+
         self.configure()?;
         self.make()?;
         self.make_install()?;
@@ -78,7 +80,21 @@ impl Build {
         Ok(())
     }
 
-    fn checkout_version(&self) -> Result<(), Box<dyn Error>> {
+    fn handle_dot_git(&self) -> Result<(), Box<dyn Error>> {
+        let dot_git_path = self.build_dir.join(".git");
+        if dot_git_path.is_dir() {
+            return Ok(());
+        }
+        if dot_git_path.exists() {
+            fs::remove_file(&dot_git_path)?;
+        }
+        let dot_git_src_path =
+            execute_command(&["git", "rev-parse", "--git-dir"], &self.source_dir)?;
+        copy_all(Path::new(dot_git_src_path.trim()), &dot_git_path)?;
+        Ok(())
+    }
+
+    fn switch_to_version(&self) -> Result<(), Box<dyn Error>> {
         let version = format!("v{}.*", self.version);
         let tags = execute_command(&["git", "tag", "-l", &version], &self.build_dir)?;
 
@@ -94,7 +110,7 @@ impl Build {
             return Err("version not found".into());
         };
 
-        execute_command(&["git", "checkout", &version], &self.build_dir)?;
+        execute_command(&["git", "reset", "--hard", &version], &self.build_dir)?;
         Ok(())
     }
 
@@ -156,6 +172,7 @@ fn copy_all(src: &Path, dst: &Path) -> Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
+
 fn execute_command(cmd: &[&str], current_dir: impl AsRef<Path>) -> Result<String, Box<dyn Error>> {
     let [program, args @ ..] = cmd else {
         return Err("cmd is empty".to_string().into());

@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Simplifies integrating librdkafka into Rust."
+license = "MulanPSL-2.0"
+repository = "https://github.com/jmjoy/rdkafka-src"
+include = ["**"]
 
 [dependencies]

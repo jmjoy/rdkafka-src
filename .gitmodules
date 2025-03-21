@@ -2,3 +2,4 @@
 	path = librdkafka
 	url = https://github.com/jmjoy/librdkafka.git
 	branch = ignore
+	shallow = 172
